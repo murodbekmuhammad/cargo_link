@@ -1,54 +1,41 @@
-# React + TypeScript + Vite
+# CargoLink — Logistics Hiring
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Hiring platform connecting logistics companies with drivers, dispatchers and warehouse staff.
 
-Currently, two official plugins are available:
+## Roles
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+| Role      | Can                                                | Sign up                  |
+|-----------|----------------------------------------------------|--------------------------|
+| Guest     | Browse vacancies and candidates (no contact info)  | —                        |
+| Applicant | Apply to vacancies, track applications             | Self sign-up             |
+| Company   | Post vacancies, review applicants (coming soon)    | Self sign-up             |
+| Admin     | Moderate companies, jobs and users (coming soon)   | Provisioned (login only) |
 
-## Expanding the ESLint configuration
+## Getting started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open http://localhost:5173. You land on the public vacancies list. Guests can browse vacancies (`/vacancies`) and candidates (`/candidates`). Clicking "Sign up to apply" takes them to applicant sign-up and then back to the vacancy.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Demo accounts:
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+| Role      | Email                     | Password   |
+|-----------|---------------------------|------------|
+| Admin     | `admin@cargolink.com`     | `admin123` |
+| Company   | `hr@silkroadfreight.demo` | `demo123`  |
+| Applicant | `jasur@demo.uz`           | `demo123`  |
+
+## Current state
+
+- Auth is **mocked in localStorage** (`src/auth/storage.ts`) until a backend exists. Passwords are stored in plain text — not for production.
+- Vacancies are demo data (`src/data/seed.ts`) until companies can post them. Applications are saved in localStorage.
+- The public candidate list shows first name + last initial, desired position, city, experience and licenses — never email or phone.
+- Each role has its own protected dashboard (`/admin`, `/company`, `/applicant`); visiting another role's route redirects to your own.
+- Most dashboard features are still placeholders.
+
+## Stack
+
+React 19 + TypeScript + Vite, React Router.
