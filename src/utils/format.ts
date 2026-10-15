@@ -4,11 +4,13 @@ export const pluralize = (n: number, word: string) => `${n} ${word}${n === 1 ? '
 
 const money = (n: number) => `$${n.toLocaleString('en-US')}`;
 
-export function formatSalary(v: Pick<Vacancy, 'salaryMin' | 'salaryMax'>): string {
+export function formatSalary(v: Pick<Vacancy, 'salaryMin' | 'salaryMax' | 'source'>): string {
+  if (v.salaryMin && v.salaryMin === v.salaryMax) return `${money(v.salaryMin)} / month`;
   if (v.salaryMin && v.salaryMax) return `${money(v.salaryMin)} – ${money(v.salaryMax)} / month`;
   if (v.salaryMin) return `from ${money(v.salaryMin)} / month`;
   if (v.salaryMax) return `up to ${money(v.salaryMax)} / month`;
-  return 'Salary negotiable';
+  // Imported posts often give pay in so'm or in words; the full post text is on the vacancy page.
+  return v.source ? 'Salary: see post' : 'Salary negotiable';
 }
 
 export function timeAgo(iso: string): string {

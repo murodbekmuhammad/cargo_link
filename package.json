@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "telegram:login": "node scripts/telegram/login.mjs",
+    "telegram:sync": "node scripts/telegram/sync.mjs",
+    "test": "node --test scripts/telegram/parse.test.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
@@ -25,6 +28,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "telegram": "^2.26.22",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.30.1",
     "vite": "^6.3.5"

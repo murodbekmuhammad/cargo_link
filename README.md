@@ -44,3 +44,32 @@ Demo accounts:
 ## Stack
 
 React 19 + TypeScript + Vite, React Router.
+
+## Telegram import
+
+Every hour a GitHub Action (`.github/workflows/telegram-sync.yml`) reads new posts from the logistics
+vacancy channels your Telegram account has joined, keeps the ones that look like vacancies, and saves
+them to `public/data/telegram-vacancies.json`. The site loads that file on start and lists the posts
+next to the vacancies companies post here, tagged **via Telegram**, with a link back to the original
+post. It is free: Telegram's API, GitHub Actions and plain text rules, with no paid AI.
+
+What gets read from each post: a title (its first line), the job type, the city (one of the 13 cities
+on the map) and a salary if it's in US dollars. The full post text is always shown. Posts that are only
+an image, or that don't mention a job, are skipped. The same post forwarded to several channels is
+listed once. Imported vacancies are kept for 30 days.
+
+Setup (once):
+
+1. Get an **API ID** and **API hash** at <https://my.telegram.org> → *API development tools*.
+2. On your computer, in this folder: `npm install`, then `npm run telegram:login`. Enter the API ID,
+   API hash, your phone number and the code Telegram sends you. It prints a long **session string**.
+   That string gives full access to your Telegram account: never share it or commit it.
+3. In GitHub → *Settings* → *Secrets and variables* → *Actions*:
+   - Secrets: `TELEGRAM_API_ID`, `TELEGRAM_API_HASH`, `TELEGRAM_SESSION`.
+   - Variable: `TELEGRAM_CHANNELS`, the channels to read, separated by commas. Use the channel's
+     username (`logistika_ish` or `https://t.me/logistika_ish`) or, for a private channel, its id
+     (`-1001234567890`).
+4. *Actions* → *Import Telegram vacancies* → *Run workflow* to try it right away.
+
+Until it is set up, the hourly run does nothing and passes. To sign the session out, end it in
+Telegram → *Settings* → *Devices*. Run `npm test` to check the post parser.

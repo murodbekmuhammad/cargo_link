@@ -7,6 +7,7 @@ export const JOB_CATEGORIES = [
   'Logistics manager',
   'Mechanic',
   'Forwarder',
+  'Other',
 ] as const;
 export type JobCategory = (typeof JOB_CATEGORIES)[number];
 
@@ -68,15 +69,24 @@ export interface Vacancy {
   title: string;
   category: JobCategory;
   location?: GeoLocation;
-  employmentType: EmploymentType;
+  /** Unknown for vacancies imported from Telegram. */
+  employmentType?: EmploymentType;
   salaryMin?: number;
   salaryMax?: number;
   description: string;
   requirements: string[];
   postedAt: string;
+  /** Set when the vacancy was imported from a Telegram channel post rather than posted here. */
+  source?: VacancySource;
 }
 
-export type VacancyInput = Omit<Vacancy, 'id' | 'companyId' | 'companyName' | 'postedAt'>;
+export interface VacancySource {
+  kind: 'telegram';
+  channel: string;
+  url: string;
+}
+
+export type VacancyInput = Omit<Vacancy, 'id' | 'companyId' | 'companyName' | 'postedAt' | 'source'>;
 
 export interface Application {
   id: string;

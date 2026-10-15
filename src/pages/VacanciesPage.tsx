@@ -99,7 +99,8 @@ export function VacanciesPage() {
               <div className="tags">
                 <span className="tag">{v.category}</span>
                 <LocationTag location={v.location} distance={distance} />
-                <span className="tag">{v.employmentType}</span>
+                {v.employmentType && <span className="tag">{v.employmentType}</span>}
+                {v.source && <span className="tag tag-telegram">via Telegram</span>}
               </div>
             </Link>
           ))}

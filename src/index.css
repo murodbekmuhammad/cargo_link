@@ -150,6 +150,8 @@ a.list-card:hover { border-color: var(--primary); }
 .salary { font-weight: 600; margin: 0.25rem 0; }
 .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
 .tag { font-size: 0.8rem; background: var(--bg); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; color: var(--muted); }
+.tag-telegram { color: #1c7fbf; border-color: #9fd0ef; }
+.description { white-space: pre-line; }
 
 .detail { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 1rem; align-items: start; }
 .detail h3 { margin-top: 1.5rem; }

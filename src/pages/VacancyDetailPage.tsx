@@ -26,7 +26,20 @@ export function VacancyDetailPage() {
   const here = encodeURIComponent(`/vacancies/${vacancy.id}`);
 
   let action;
-  if (!user) {
+  if (vacancy.source) {
+    // Imported posts: the employer isn't on CargoLink, so applying happens in Telegram.
+    action = (
+      <>
+        <a href={vacancy.source.url} target="_blank" rel="noopener noreferrer" className="primary-btn">
+          Open post in Telegram
+        </a>
+        <p className="muted small">
+          Imported from the Telegram channel <strong>{vacancy.source.channel}</strong>. Contact the employer using
+          the details in the post.
+        </p>
+      </>
+    );
+  } else if (!user) {
     action = (
       <>
         <Link to={`/auth?role=applicant&mode=register&redirect=${here}`} className="primary-btn">
@@ -81,16 +94,20 @@ export function VacancyDetailPage() {
             ) : (
               <span className="tag">Location not specified</span>
             )}
-            <span className="tag">{vacancy.employmentType}</span>
+            {vacancy.employmentType && <span className="tag">{vacancy.employmentType}</span>}
           </div>
           <h3>Description</h3>
-          <p>{vacancy.description}</p>
-          <h3>Requirements</h3>
-          <ul>
-            {vacancy.requirements.map((r) => (
-              <li key={r}>{r}</li>
-            ))}
-          </ul>
+          <p className="description">{vacancy.description}</p>
+          {vacancy.requirements.length > 0 && (
+            <>
+              <h3>Requirements</h3>
+              <ul>
+                {vacancy.requirements.map((r) => (
+                  <li key={r}>{r}</li>
+                ))}
+              </ul>
+            </>
+          )}
         </article>
         <aside className="card apply-box">
           <p className="salary">{formatSalary(vacancy)}</p>
