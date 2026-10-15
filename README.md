@@ -35,7 +35,8 @@ Demo accounts:
 - The public candidate list shows first name + last initial, desired position, city, experience and licenses — never email or phone.
 - **Vacancies have an optional location** (a city, or the company's current position). Applicants have no location.
 - The vacancies list has a **List / Map** switch (`/vacancies?view=map`) and a "Near" filter (a city or the visitor's current location, never saved) that sorts by distance and can limit to a radius. Each vacancy page shows its location on a map.
-- Maps use [Leaflet](https://leafletjs.com) with OpenStreetMap's public tiles, which are fine for development but [not for production traffic](https://operations.osmfoundation.org/policies/tiles/) — switch to a tile provider (MapTiler, Stadia, Mapbox, …) before launch.
+- Maps only show pins (no routes or directions) and are **free**: [Leaflet](https://leafletjs.com) + OpenStreetMap tiles, no API key or paid account.
+  - OpenStreetMap's tile server is free under a [fair-use policy](https://operations.osmfoundation.org/policies/tiles/) meant for light use. If traffic grows large, self-host the tiles (still free, e.g. [OpenMapTiles](https://openmaptiles.org/) or [Protomaps](https://protomaps.com/) with an Uzbekistan extract) and set `VITE_MAP_TILE_URL` to your tile URL — no code change needed.
 - Companies can post vacancies from their dashboard (saved in localStorage).
 - Each role has its own protected dashboard (`/admin`, `/company`, `/applicant`); visiting another role's route redirects to your own.
 - Most dashboard features are still placeholders.

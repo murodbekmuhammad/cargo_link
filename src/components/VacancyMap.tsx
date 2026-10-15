@@ -20,6 +20,10 @@ const pinIcon = L.icon({
   shadowSize: [41, 41],
 });
 
+// Free OpenStreetMap tiles by default (no key, no account). Point VITE_MAP_TILE_URL at a
+// self-hosted tile server later if traffic outgrows OSM's fair-use policy.
+const TILE_URL = import.meta.env.VITE_MAP_TILE_URL || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+
 const UZBEKISTAN_CENTER: L.LatLngExpression = [41.0, 64.5];
 
 const escapeHtml = (s: string) =>
@@ -52,7 +56,7 @@ export function VacancyMap({ vacancies, origin, height = 480, showLinks = true }
     const el = containerRef.current;
     if (!el) return;
     const map = L.map(el, { scrollWheelZoom: false }).setView(UZBEKISTAN_CENTER, 5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer(TILE_URL, {
       maxZoom: 18,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
