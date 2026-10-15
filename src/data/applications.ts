@@ -1,4 +1,4 @@
-import type { Application } from '../types';
+import type { Application, GeoLocation } from '../types';
 
 const APPLICATIONS_KEY = 'cargolink.applications';
 
@@ -21,7 +21,7 @@ export function hasApplied(vacancyId: string, applicantId: string): boolean {
   return read().some((a) => a.vacancyId === vacancyId && a.applicantId === applicantId);
 }
 
-export function applyToVacancy(vacancyId: string, applicantId: string): Application {
+export function applyToVacancy(vacancyId: string, applicantId: string, location?: GeoLocation): Application {
   const all = read();
   const existing = all.find((a) => a.vacancyId === vacancyId && a.applicantId === applicantId);
   if (existing) return existing;
@@ -29,9 +29,14 @@ export function applyToVacancy(vacancyId: string, applicantId: string): Applicat
     id: crypto.randomUUID(),
     vacancyId,
     applicantId,
+    location,
     status: 'submitted',
     createdAt: new Date().toISOString(),
   };
   localStorage.setItem(APPLICATIONS_KEY, JSON.stringify([...all, application]));
   return application;
+}
+
+export function countApplications(vacancyId: string): number {
+  return read().filter((a) => a.vacancyId === vacancyId).length;
 }

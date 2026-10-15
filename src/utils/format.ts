@@ -1,5 +1,7 @@
 import type { Vacancy } from '../types';
 
+export const pluralize = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
 const money = (n: number) => `$${n.toLocaleString('en-US')}`;
 
 export function formatSalary(v: Pick<Vacancy, 'salaryMin' | 'salaryMax'>): string {

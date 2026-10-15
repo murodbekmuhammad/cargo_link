@@ -127,9 +127,12 @@ a.secondary-btn { color: var(--text); }
 .small-btn { padding: 0.4rem 0.9rem; }
 .primary-btn:disabled { background: #16a34a; cursor: default; }
 
-.filters { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 0.75rem; margin: 1.25rem 0 0.5rem; }
-.filters:has(> :nth-child(2):last-child) { grid-template-columns: 2fr 1fr; }
-.filters input, .filters select, .auth-form select {
+.filters { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.25rem 0 0.5rem; }
+.filters > * { flex: 1 1 170px; }
+.filters > input[type='search'] { flex: 2 1 260px; }
+.location-picker { display: grid; gap: 0.25rem; }
+.location-picker select { width: 100%; }
+.filters input, .filters select, .auth-form select, .auth-form textarea, .field select {
   font: inherit;
   padding: 0.6rem 0.8rem;
   border: 1px solid var(--border);
@@ -162,7 +165,7 @@ a.list-card:hover { border-color: var(--primary); }
 .plain-list li { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: 0.6rem 0; border-top: 1px solid var(--border); }
 
 @media (max-width: 800px) {
-  .filters, .filters:has(> :nth-child(2):last-child) { grid-template-columns: 1fr; }
+  .filters > *, .filters > input[type='search'] { flex-basis: 100%; }
   .detail { grid-template-columns: 1fr; }
   .apply-box { position: static; }
   .topbar { flex-wrap: wrap; gap: 0.5rem; }
@@ -170,3 +173,12 @@ a.list-card:hover { border-color: var(--primary); }
   .topbar-right .muted { display: none; }
   .form-row { grid-template-columns: 1fr; }
 }
+
+.auth-form textarea { font: inherit; resize: vertical; }
+.auth-form label > span { font-weight: 500; }
+.field { display: grid; gap: 0.35rem; font-size: 0.9rem; font-weight: 500; }
+.field select { font: inherit; padding: 0.55rem 0.7rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.tag strong { color: var(--primary); font-weight: 600; }
+.vacancy-form { border-top: 1px solid var(--border); padding-top: 1rem; margin-bottom: 1rem; }
+.form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; }
+.form-actions .primary-btn { padding: 0.6rem 1.2rem; }

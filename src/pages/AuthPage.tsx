@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
-import { JOB_CATEGORIES, ROLE_HOME, type JobCategory, type Role } from '../types';
+import { LocationPicker } from '../components/LocationPicker';
+import { JOB_CATEGORIES, ROLE_HOME, type GeoLocation, type JobCategory, type Role } from '../types';
 
 const ROLES: { value: Role; title: string; description: string; icon: string }[] = [
   {
@@ -44,12 +45,12 @@ export function AuthPage() {
   });
   const [mode, setMode] = useState<Mode>(params.get('mode') === 'register' ? 'register' : 'login');
   const [error, setError] = useState<string | null>(null);
+  const [location, setLocation] = useState<GeoLocation>();
   const [form, setForm] = useState({
     name: '',
     companyName: '',
     phone: '',
     desiredPosition: '',
-    location: '',
     email: '',
     password: '',
     confirm: '',
@@ -86,7 +87,7 @@ export function AuthPage() {
           phone: role === 'applicant' ? form.phone.trim() : undefined,
           desiredPosition:
             role === 'applicant' && form.desiredPosition ? (form.desiredPosition as JobCategory) : undefined,
-          location: role === 'applicant' ? form.location.trim() || undefined : undefined,
+          location: role === 'applicant' ? location : undefined,
         });
       }
       navigate(redirect ?? ROLE_HOME[u.role], { replace: true });
@@ -180,7 +181,7 @@ export function AuthPage() {
                 </label>
               )}
               {isRegister && role === 'applicant' && (
-                <div className="form-row">
+                <>
                   <label>
                     Desired position
                     <select value={form.desiredPosition} onChange={update('desiredPosition')}>
@@ -191,10 +192,12 @@ export function AuthPage() {
                     </select>
                   </label>
                   <label>
-                    City
-                    <input value={form.location} onChange={update('location')} autoComplete="address-level2" />
+                    <span>
+                      Location <span className="muted">(optional — helps nearby companies find you)</span>
+                    </span>
+                    <LocationPicker value={location} onChange={setLocation} />
                   </label>
-                </div>
+                </>
               )}
               <label>
                 Email

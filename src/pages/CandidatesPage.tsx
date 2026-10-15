@@ -2,22 +2,29 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import { listCandidates } from '../auth/storage';
+import { LocationTag } from '../components/LocationTag';
+import { NearFilter } from '../components/NearFilter';
 import { PublicLayout } from '../components/PublicLayout';
-import { JOB_CATEGORIES } from '../types';
+import { JOB_CATEGORIES, type GeoLocation } from '../types';
 import { timeAgo } from '../utils/format';
+import { nearby } from '../utils/geo';
 
 export function CandidatesPage() {
   const { user } = useAuth();
   const candidates = useMemo(() => listCandidates(), []);
   const [query, setQuery] = useState('');
   const [position, setPosition] = useState('');
+  const [origin, setOrigin] = useState<GeoLocation>();
+  const [radiusKm, setRadiusKm] = useState<number | null>(null);
 
   const q = query.trim().toLowerCase();
-  const filtered = candidates.filter(
+  const matching = candidates.filter(
     (c) =>
-      (!q || [c.displayName, c.location ?? '', c.about ?? ''].some((s) => s.toLowerCase().includes(q))) &&
+      (!q ||
+        [c.displayName, c.location?.label ?? '', c.about ?? ''].some((s) => s.toLowerCase().includes(q))) &&
       (!position || c.desiredPosition === position),
   );
+  const results = nearby(matching, (c) => c.location, origin, radiusKm);
 
   return (
     <PublicLayout>
@@ -46,11 +53,14 @@ export function CandidatesPage() {
             <option key={c}>{c}</option>
           ))}
         </select>
+        <NearFilter origin={origin} onOriginChange={setOrigin} radiusKm={radiusKm} onRadiusChange={setRadiusKm} />
       </div>
 
-      <p className="muted small">{filtered.length} candidates</p>
+      <p className="muted small">
+        {results.length} candidates{origin && ` · sorted by distance from ${origin.label}`}
+      </p>
       <div className="list">
-        {filtered.map((c) => (
+        {results.map(({ item: c, distance }) => (
           <div key={c.id} className="card list-card">
             <div className="list-card-head">
               <h3>{c.displayName}</h3>
@@ -59,7 +69,7 @@ export function CandidatesPage() {
             <p className="company">{c.desiredPosition ?? 'Position not specified'}</p>
             {c.about && <p className="muted">{c.about}</p>}
             <div className="tags">
-              {c.location && <span className="tag">📍 {c.location}</span>}
+              <LocationTag location={c.location} distance={distance} />
               {c.experienceYears !== undefined && (
                 <span className="tag">
                   {c.experienceYears} {c.experienceYears === 1 ? 'year' : 'years'} experience
@@ -69,7 +79,7 @@ export function CandidatesPage() {
             </div>
           </div>
         ))}
-        {filtered.length === 0 && <p className="muted">No candidates match your filters.</p>}
+        {results.length === 0 && <p className="muted">No candidates match your filters.</p>}
       </div>
     </PublicLayout>
   );

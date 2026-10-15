@@ -33,6 +33,8 @@ Demo accounts:
 - Auth is **mocked in localStorage** (`src/auth/storage.ts`) until a backend exists. Passwords are stored in plain text — not for production.
 - Vacancies are demo data (`src/data/seed.ts`) until companies can post them. Applications are saved in localStorage.
 - The public candidate list shows first name + last initial, desired position, city, experience and licenses — never email or phone.
+- **Location is optional** on applicant sign-up, applications and vacancies. Pick a city or use the browser's current location. Vacancies and candidates lists have a "Near" filter that sorts by distance and can limit to a radius. Candidates' public coordinates are rounded to ~10 km.
+- Companies can post vacancies from their dashboard (saved in localStorage).
 - Each role has its own protected dashboard (`/admin`, `/company`, `/applicant`); visiting another role's route redirects to your own.
 - Most dashboard features are still placeholders.
 

@@ -1,24 +1,28 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { LocationTag } from '../components/LocationTag';
+import { NearFilter } from '../components/NearFilter';
 import { PublicLayout } from '../components/PublicLayout';
 import { listVacancies } from '../data/vacancies';
-import { JOB_CATEGORIES } from '../types';
+import { JOB_CATEGORIES, type GeoLocation } from '../types';
 import { formatSalary, timeAgo } from '../utils/format';
+import { nearby } from '../utils/geo';
 
 export function VacanciesPage() {
   const vacancies = useMemo(() => listVacancies(), []);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
-  const [location, setLocation] = useState('');
+  const [origin, setOrigin] = useState<GeoLocation>();
+  const [radiusKm, setRadiusKm] = useState<number | null>(null);
 
-  const locations = useMemo(() => [...new Set(vacancies.map((v) => v.location))].sort(), [vacancies]);
   const q = query.trim().toLowerCase();
-  const filtered = vacancies.filter(
+  const matching = vacancies.filter(
     (v) =>
-      (!q || [v.title, v.companyName, v.location, v.description].some((s) => s.toLowerCase().includes(q))) &&
-      (!category || v.category === category) &&
-      (!location || v.location === location),
+      (!q ||
+        [v.title, v.companyName, v.location?.label ?? '', v.description].some((s) => s.toLowerCase().includes(q))) &&
+      (!category || v.category === category),
   );
+  const results = nearby(matching, (v) => v.location, origin, radiusKm);
 
   return (
     <PublicLayout>
@@ -39,17 +43,14 @@ export function VacanciesPage() {
             <option key={c}>{c}</option>
           ))}
         </select>
-        <select value={location} onChange={(e) => setLocation(e.target.value)} aria-label="Location">
-          <option value="">All locations</option>
-          {locations.map((l) => (
-            <option key={l}>{l}</option>
-          ))}
-        </select>
+        <NearFilter origin={origin} onOriginChange={setOrigin} radiusKm={radiusKm} onRadiusChange={setRadiusKm} />
       </div>
 
-      <p className="muted small">{filtered.length} vacancies</p>
+      <p className="muted small">
+        {results.length} vacancies{origin && ` · sorted by distance from ${origin.label}`}
+      </p>
       <div className="list">
-        {filtered.map((v) => (
+        {results.map(({ item: v, distance }) => (
           <Link key={v.id} to={`/vacancies/${v.id}`} className="card list-card">
             <div className="list-card-head">
               <h3>{v.title}</h3>
@@ -59,12 +60,12 @@ export function VacanciesPage() {
             <p className="salary">{formatSalary(v)}</p>
             <div className="tags">
               <span className="tag">{v.category}</span>
-              <span className="tag">📍 {v.location}</span>
+              <LocationTag location={v.location} distance={distance} />
               <span className="tag">{v.employmentType}</span>
             </div>
           </Link>
         ))}
-        {filtered.length === 0 && <p className="muted">No vacancies match your filters.</p>}
+        {results.length === 0 && <p className="muted">No vacancies match your filters.</p>}
       </div>
     </PublicLayout>
   );

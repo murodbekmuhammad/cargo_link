@@ -4,6 +4,7 @@ import { DashboardLayout, Placeholder } from '../../components/DashboardLayout';
 import { listApplicationsByApplicant } from '../../data/applications';
 import { getVacancy } from '../../data/vacancies';
 import { timeAgo } from '../../utils/format';
+import { distanceKm } from '../../utils/geo';
 
 export function ApplicantDashboard() {
   const { user } = useAuth();
@@ -26,6 +27,12 @@ export function ApplicantDashboard() {
                   <div>
                     <Link to={`/vacancies/${a.vacancyId}`}>{v?.title ?? 'Removed vacancy'}</Link>
                     <span className="muted small"> · {v?.companyName}</span>
+                    {a.location && (
+                      <div className="muted small">
+                        Your location: {a.location.label}
+                        {v?.location && ` · ${Math.round(distanceKm(a.location, v.location))} km from the job`}
+                      </div>
+                    )}
                   </div>
                   <span className="muted small">
                     Submitted {timeAgo(a.createdAt).toLowerCase()} <span className="tag">Submitted</span>

@@ -1,16 +1,21 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
+import { LocationPicker } from '../components/LocationPicker';
+import { LocationTag } from '../components/LocationTag';
 import { PublicLayout } from '../components/PublicLayout';
 import { applyToVacancy, hasApplied } from '../data/applications';
 import { getVacancy } from '../data/vacancies';
+import type { GeoLocation } from '../types';
 import { formatSalary, timeAgo } from '../utils/format';
+import { distanceKm } from '../utils/geo';
 
 export function VacancyDetailPage() {
   const { id = '' } = useParams();
   const { user } = useAuth();
   const vacancy = getVacancy(id);
   const [applied, setApplied] = useState(() => (user ? hasApplied(id, user.id) : false));
+  const [applyFrom, setApplyFrom] = useState<GeoLocation | undefined>(user?.location);
 
   if (!vacancy) {
     return (
@@ -21,6 +26,8 @@ export function VacancyDetailPage() {
     );
   }
 
+  const distanceFromYou =
+    user?.location && vacancy.location ? distanceKm(user.location, vacancy.location) : undefined;
   const here = encodeURIComponent(`/vacancies/${vacancy.id}`);
 
   let action;
@@ -50,16 +57,28 @@ export function VacancyDetailPage() {
     );
   } else {
     action = (
-      <button
-        type="button"
-        className="primary-btn"
-        onClick={() => {
-          applyToVacancy(vacancy.id, user.id);
-          setApplied(true);
-        }}
-      >
-        Apply now
-      </button>
+      <>
+        <label className="field">
+          <span>
+            Your location <span className="muted">(optional)</span>
+          </span>
+          <LocationPicker
+            value={applyFrom}
+            onChange={setApplyFrom}
+            presets={user.location ? [{ label: `My location — ${user.location.label}`, location: user.location }] : []}
+          />
+        </label>
+        <button
+          type="button"
+          className="primary-btn"
+          onClick={() => {
+            applyToVacancy(vacancy.id, user.id, applyFrom);
+            setApplied(true);
+          }}
+        >
+          Apply now
+        </button>
+      </>
     );
   }
 
@@ -74,7 +93,11 @@ export function VacancyDetailPage() {
           <p className="company">{vacancy.companyName}</p>
           <div className="tags">
             <span className="tag">{vacancy.category}</span>
-            <span className="tag">📍 {vacancy.location}</span>
+            {vacancy.location ? (
+              <LocationTag location={vacancy.location} distance={distanceFromYou} />
+            ) : (
+              <span className="tag">Location not specified</span>
+            )}
             <span className="tag">{vacancy.employmentType}</span>
           </div>
           <h3>Description</h3>

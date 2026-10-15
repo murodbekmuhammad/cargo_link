@@ -11,6 +11,14 @@ export const JOB_CATEGORIES = [
 export type JobCategory = (typeof JOB_CATEGORIES)[number];
 
 export type EmploymentType = 'Full-time' | 'Part-time' | 'Contract';
+export const EMPLOYMENT_TYPES: EmploymentType[] = ['Full-time', 'Part-time', 'Contract'];
+
+/** A place with coordinates, so lists can be filtered and sorted by distance. */
+export interface GeoLocation {
+  label: string;
+  lat: number;
+  lng: number;
+}
 
 export interface User {
   id: string;
@@ -22,7 +30,7 @@ export interface User {
   /** Applicant accounts only. */
   phone?: string;
   desiredPosition?: JobCategory;
-  location?: string;
+  location?: GeoLocation;
   experienceYears?: number;
   licenses?: string[];
   about?: string;
@@ -41,7 +49,7 @@ export interface RegisterInput {
   companyName?: string;
   phone?: string;
   desiredPosition?: JobCategory;
-  location?: string;
+  location?: GeoLocation;
 }
 
 /** What anyone, including guests, may see about an applicant. No contact details. */
@@ -49,7 +57,7 @@ export interface PublicCandidate {
   id: string;
   displayName: string;
   desiredPosition?: JobCategory;
-  location?: string;
+  location?: GeoLocation;
   experienceYears?: number;
   licenses: string[];
   about?: string;
@@ -62,7 +70,7 @@ export interface Vacancy {
   companyName: string;
   title: string;
   category: JobCategory;
-  location: string;
+  location?: GeoLocation;
   employmentType: EmploymentType;
   salaryMin?: number;
   salaryMax?: number;
@@ -71,10 +79,14 @@ export interface Vacancy {
   postedAt: string;
 }
 
+export type VacancyInput = Omit<Vacancy, 'id' | 'companyId' | 'companyName' | 'postedAt'>;
+
 export interface Application {
   id: string;
   vacancyId: string;
   applicantId: string;
+  /** Where the applicant was when applying (optional). */
+  location?: GeoLocation;
   status: 'submitted';
   createdAt: string;
 }

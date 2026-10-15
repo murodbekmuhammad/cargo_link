@@ -1,10 +1,13 @@
-import type { StoredUser, Vacancy } from '../types';
+import type { GeoLocation, StoredUser, Vacancy } from '../types';
+import { cityLocation } from './cities';
 
 // Demo data so the public lists aren't empty before companies start posting.
 // All demo accounts use the password "demo123".
 
-const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
+// Anchored to midnight so anything posted later today sorts above the demo data.
+const daysAgo = (n: number) => new Date(new Date().setHours(0, 0, 0, 0) - n * 86_400_000).toISOString();
 const EPOCH = new Date(0).toISOString();
+const city = (name: string): GeoLocation => cityLocation(name)!;
 
 export const SEED_USERS: StoredUser[] = [
   {
@@ -41,7 +44,7 @@ export const SEED_USERS: StoredUser[] = [
     name: 'Jasur Tursunov',
     phone: '+998 90 000 00 01',
     desiredPosition: 'Truck driver',
-    location: 'Tashkent',
+    location: city('Tashkent'),
     experienceYears: 8,
     licenses: ['B', 'C', 'CE'],
     about: 'International routes to Kazakhstan and Russia. Clean record, ADR certified.',
@@ -55,7 +58,7 @@ export const SEED_USERS: StoredUser[] = [
     name: 'Malika Yusupova',
     phone: '+998 90 000 00 02',
     desiredPosition: 'Dispatcher',
-    location: 'Samarkand',
+    location: city('Samarkand'),
     experienceYears: 4,
     licenses: [],
     about: 'Fleet dispatching for 40+ trucks, fluent in Uzbek, Russian and English.',
@@ -69,7 +72,7 @@ export const SEED_USERS: StoredUser[] = [
     name: 'Otabek Rakhimov',
     phone: '+998 90 000 00 03',
     desiredPosition: 'Warehouse',
-    location: 'Tashkent',
+    location: city('Tashkent'),
     experienceYears: 2,
     licenses: ['B'],
     about: 'Forklift operator, inventory management with 1C.',
@@ -83,7 +86,7 @@ export const SEED_USERS: StoredUser[] = [
     name: 'Sardor Nazarov',
     phone: '+998 90 000 00 04',
     desiredPosition: 'Mechanic',
-    location: 'Bukhara',
+    location: city('Bukhara'),
     experienceYears: 10,
     licenses: ['B', 'C'],
     about: 'Diesel engines and refrigeration units — MAN, Volvo, Scania.',
@@ -98,7 +101,7 @@ export const SEED_VACANCIES: Vacancy[] = [
     companyName: 'Silk Road Freight',
     title: 'International truck driver (CE)',
     category: 'Truck driver',
-    location: 'Tashkent',
+    location: city('Tashkent'),
     employmentType: 'Full-time',
     salaryMin: 1500,
     salaryMax: 2200,
@@ -113,7 +116,7 @@ export const SEED_VACANCIES: Vacancy[] = [
     companyName: 'Silk Road Freight',
     title: 'Freight dispatcher',
     category: 'Dispatcher',
-    location: 'Tashkent',
+    location: city('Tashkent'),
     employmentType: 'Full-time',
     salaryMin: 700,
     salaryMax: 1000,
@@ -127,7 +130,7 @@ export const SEED_VACANCIES: Vacancy[] = [
     companyName: 'TransAsia Logistics',
     title: 'Warehouse operator (forklift)',
     category: 'Warehouse',
-    location: 'Samarkand',
+    location: city('Samarkand'),
     employmentType: 'Full-time',
     salaryMin: 450,
     salaryMax: 600,
@@ -141,7 +144,7 @@ export const SEED_VACANCIES: Vacancy[] = [
     companyName: 'TransAsia Logistics',
     title: 'Truck mechanic',
     category: 'Mechanic',
-    location: 'Bukhara',
+    location: city('Bukhara'),
     employmentType: 'Full-time',
     salaryMin: 800,
     salaryMax: 1200,
@@ -155,7 +158,7 @@ export const SEED_VACANCIES: Vacancy[] = [
     companyName: 'TransAsia Logistics',
     title: 'Customs forwarder',
     category: 'Forwarder',
-    location: 'Tashkent',
+    location: city('Tashkent'),
     employmentType: 'Contract',
     description: 'Prepare customs documents for export and import shipments to China and the EU.',
     requirements: ['Customs declarant certificate', 'English — intermediate'],
@@ -167,7 +170,7 @@ export const SEED_VACANCIES: Vacancy[] = [
     companyName: 'Silk Road Freight',
     title: 'Local delivery driver (C)',
     category: 'Truck driver',
-    location: 'Samarkand',
+    location: city('Samarkand'),
     employmentType: 'Part-time',
     salaryMin: 400,
     salaryMax: 550,
