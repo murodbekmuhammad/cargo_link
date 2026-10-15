@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
-import { ROLE_HOME, type Role } from '../types';
+import { JOB_CATEGORIES, ROLE_HOME, type JobCategory, type Role } from '../types';
 
 const ROLES: { value: Role; title: string; description: string; icon: string }[] = [
   {
@@ -26,29 +26,43 @@ const ROLES: { value: Role; title: string; description: string; icon: string }[]
 
 type Mode = 'login' | 'register';
 
+const isRole = (v: string | null): v is Role => v === 'admin' || v === 'company' || v === 'applicant';
+
+/** Only allow same-app paths, never "//evil.com" or absolute URLs. */
+function safeRedirect(v: string | null): string | null {
+  return v && v.startsWith('/') && !v.startsWith('//') ? v : null;
+}
+
 export function AuthPage() {
   const { user, login, register } = useAuth();
   const navigate = useNavigate();
-  const [role, setRole] = useState<Role | null>(null);
-  const [mode, setMode] = useState<Mode>('login');
+  const [params] = useSearchParams();
+  const redirect = safeRedirect(params.get('redirect'));
+  const [role, setRole] = useState<Role | null>(() => {
+    const r = params.get('role');
+    return isRole(r) ? r : null;
+  });
+  const [mode, setMode] = useState<Mode>(params.get('mode') === 'register' ? 'register' : 'login');
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: '',
     companyName: '',
     phone: '',
+    desiredPosition: '',
+    location: '',
     email: '',
     password: '',
     confirm: '',
   });
 
-  if (user) return <Navigate to={ROLE_HOME[user.role]} replace />;
+  if (user) return <Navigate to={redirect ?? ROLE_HOME[user.role]} replace />;
 
-  const update = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const update = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const chooseRole = (r: Role) => {
     setRole(r);
-    setMode('login');
+    if (r === 'admin') setMode('login');
     setError(null);
   };
 
@@ -70,9 +84,12 @@ export function AuthPage() {
           name: form.name,
           companyName: role === 'company' ? form.companyName.trim() : undefined,
           phone: role === 'applicant' ? form.phone.trim() : undefined,
+          desiredPosition:
+            role === 'applicant' && form.desiredPosition ? (form.desiredPosition as JobCategory) : undefined,
+          location: role === 'applicant' ? form.location.trim() || undefined : undefined,
         });
       }
-      navigate(ROLE_HOME[u.role], { replace: true });
+      navigate(redirect ?? ROLE_HOME[u.role], { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
     }
@@ -90,6 +107,9 @@ export function AuthPage() {
         </div>
         <h1>Hiring for the people who keep freight moving.</h1>
         <p>Connect logistics companies with drivers, dispatchers and warehouse professionals.</p>
+        <Link to="/vacancies" className="hero-link">
+          Browse vacancies without an account →
+        </Link>
       </aside>
 
       <main className="auth-panel">
@@ -115,6 +135,10 @@ export function AuthPage() {
             <h2>
               <span aria-hidden>{selected.icon}</span> {selected.title} {isRegister ? 'sign up' : 'sign in'}
             </h2>
+
+            {redirect?.startsWith('/vacancies/') && role !== 'admin' && (
+              <p className="notice">Sign in or create an applicant account to apply for this vacancy.</p>
+            )}
 
             {role !== 'admin' && (
               <div className="tabs" role="tablist">
@@ -154,6 +178,23 @@ export function AuthPage() {
                   Phone
                   <input type="tel" required value={form.phone} onChange={update('phone')} autoComplete="tel" />
                 </label>
+              )}
+              {isRegister && role === 'applicant' && (
+                <div className="form-row">
+                  <label>
+                    Desired position
+                    <select value={form.desiredPosition} onChange={update('desiredPosition')}>
+                      <option value="">Not specified</option>
+                      {JOB_CATEGORIES.map((c) => (
+                        <option key={c}>{c}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    City
+                    <input value={form.location} onChange={update('location')} autoComplete="address-level2" />
+                  </label>
+                </div>
               )}
               <label>
                 Email

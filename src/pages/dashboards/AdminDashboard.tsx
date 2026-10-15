@@ -1,4 +1,5 @@
 import { listUsers } from '../../auth/storage';
+import { listVacancies } from '../../data/vacancies';
 import { DashboardLayout, Placeholder } from '../../components/DashboardLayout';
 
 export function AdminDashboard() {
@@ -10,7 +11,7 @@ export function AdminDashboard() {
       <div className="stats">
         <div className="stat"><span className="stat-value">{count('company')}</span>Companies</div>
         <div className="stat"><span className="stat-value">{count('applicant')}</span>Applicants</div>
-        <div className="stat"><span className="stat-value">0</span>Open jobs</div>
+        <div className="stat"><span className="stat-value">{listVacancies().length}</span>Open jobs</div>
       </div>
       <Placeholder
         items={[

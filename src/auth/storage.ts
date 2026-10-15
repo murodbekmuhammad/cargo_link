@@ -1,28 +1,22 @@
-import type { RegisterInput, Role, StoredUser, User } from '../types';
+import { SEED_USERS } from '../data/seed';
+import { shortName } from '../utils/format';
+import type { PublicCandidate, RegisterInput, Role, StoredUser, User } from '../types';
 
 // Temporary client-side persistence until a real backend exists.
 // Passwords are stored in plain text here — do NOT ship this to production.
 const USERS_KEY = 'cargolink.users';
 const SESSION_KEY = 'cargolink.session';
 
-const SEED_ADMIN: StoredUser = {
-  id: 'admin-1',
-  role: 'admin',
-  email: 'admin@cargolink.com',
-  password: 'admin123',
-  name: 'Platform Admin',
-  createdAt: new Date(0).toISOString(),
-};
-
 function readUsers(): StoredUser[] {
+  let stored: StoredUser[] = [];
   try {
     const raw = localStorage.getItem(USERS_KEY);
-    const users: StoredUser[] = raw ? JSON.parse(raw) : [];
-    if (!users.some((u) => u.role === 'admin')) users.unshift(SEED_ADMIN);
-    return users;
+    stored = raw ? JSON.parse(raw) : [];
   } catch {
-    return [SEED_ADMIN];
+    // fall through with no stored users
   }
+  const missingSeeds = SEED_USERS.filter((seed) => !stored.some((u) => u.id === seed.id));
+  return [...missingSeeds, ...stored];
 }
 
 function writeUsers(users: StoredUser[]) {
@@ -79,4 +73,20 @@ export function logout() {
 
 export function listUsers(): User[] {
   return readUsers().map(toPublic);
+}
+
+export function listCandidates(): PublicCandidate[] {
+  return readUsers()
+    .filter((u) => u.role === 'applicant')
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .map((u) => ({
+      id: u.id,
+      displayName: shortName(u.name),
+      desiredPosition: u.desiredPosition,
+      location: u.location,
+      experienceYears: u.experienceYears,
+      licenses: u.licenses ?? [],
+      about: u.about,
+      joinedAt: u.createdAt,
+    }));
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 
 export function DashboardLayout({ title, children }: { title: string; children: ReactNode }) {
@@ -6,10 +7,16 @@ export function DashboardLayout({ title, children }: { title: string; children: 
   return (
     <div className="dashboard">
       <header className="topbar">
-        <div className="brand">
-          <img src="/truck.svg" alt="" width={24} height={24} />
-          <span>CargoLink</span>
-          <span className="role-badge">{user?.role}</span>
+        <div className="topbar-left">
+          <Link to="/vacancies" className="brand">
+            <img src="/truck.svg" alt="" width={24} height={24} />
+            <span>CargoLink</span>
+            <span className="role-badge">{user?.role}</span>
+          </Link>
+          <nav className="nav">
+            <NavLink to="/vacancies">Vacancies</NavLink>
+            <NavLink to="/candidates">Candidates</NavLink>
+          </nav>
         </div>
         <div className="topbar-right">
           <span className="muted">{user?.companyName ?? user?.name}</span>

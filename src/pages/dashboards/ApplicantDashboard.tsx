@@ -1,13 +1,45 @@
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../auth/useAuth';
 import { DashboardLayout, Placeholder } from '../../components/DashboardLayout';
+import { listApplicationsByApplicant } from '../../data/applications';
+import { getVacancy } from '../../data/vacancies';
+import { timeAgo } from '../../utils/format';
 
 export function ApplicantDashboard() {
+  const { user } = useAuth();
+  const applications = user ? listApplicationsByApplicant(user.id) : [];
+
   return (
     <DashboardLayout title="Applicant dashboard">
+      <section className="card">
+        <h3>My applications</h3>
+        {applications.length === 0 ? (
+          <p className="muted">
+            You haven't applied anywhere yet. <Link to="/vacancies">Browse vacancies</Link>
+          </p>
+        ) : (
+          <ul className="plain-list">
+            {applications.map((a) => {
+              const v = getVacancy(a.vacancyId);
+              return (
+                <li key={a.id}>
+                  <div>
+                    <Link to={`/vacancies/${a.vacancyId}`}>{v?.title ?? 'Removed vacancy'}</Link>
+                    <span className="muted small"> · {v?.companyName}</span>
+                  </div>
+                  <span className="muted small">
+                    Submitted {timeAgo(a.createdAt).toLowerCase()} <span className="tag">Submitted</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
       <Placeholder
         items={[
-          { title: 'Find jobs', text: 'Browse logistics vacancies by role, location and license class.' },
           { title: 'My profile', text: 'Experience, driver license categories, documents and resume.' },
-          { title: 'My applications', text: 'Track the status of jobs you applied to.' },
+          { title: 'Job alerts', text: 'Get notified when matching vacancies are posted.' },
         ]}
       />
     </DashboardLayout>
