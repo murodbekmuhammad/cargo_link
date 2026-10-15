@@ -30,7 +30,6 @@ export interface User {
   /** Applicant accounts only. */
   phone?: string;
   desiredPosition?: JobCategory;
-  location?: GeoLocation;
   experienceYears?: number;
   licenses?: string[];
   about?: string;
@@ -49,7 +48,6 @@ export interface RegisterInput {
   companyName?: string;
   phone?: string;
   desiredPosition?: JobCategory;
-  location?: GeoLocation;
 }
 
 /** What anyone, including guests, may see about an applicant. No contact details. */
@@ -57,7 +55,6 @@ export interface PublicCandidate {
   id: string;
   displayName: string;
   desiredPosition?: JobCategory;
-  location?: GeoLocation;
   experienceYears?: number;
   licenses: string[];
   about?: string;
@@ -85,8 +82,6 @@ export interface Application {
   id: string;
   vacancyId: string;
   applicantId: string;
-  /** Where the applicant was when applying (optional). */
-  location?: GeoLocation;
   status: 'submitted';
   createdAt: string;
 }

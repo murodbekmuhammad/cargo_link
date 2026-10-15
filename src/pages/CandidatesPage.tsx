@@ -2,29 +2,23 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import { listCandidates } from '../auth/storage';
-import { LocationTag } from '../components/LocationTag';
-import { NearFilter } from '../components/NearFilter';
 import { PublicLayout } from '../components/PublicLayout';
-import { JOB_CATEGORIES, type GeoLocation } from '../types';
+import { JOB_CATEGORIES } from '../types';
 import { timeAgo } from '../utils/format';
-import { nearby } from '../utils/geo';
 
 export function CandidatesPage() {
   const { user } = useAuth();
   const candidates = useMemo(() => listCandidates(), []);
   const [query, setQuery] = useState('');
   const [position, setPosition] = useState('');
-  const [origin, setOrigin] = useState<GeoLocation>();
-  const [radiusKm, setRadiusKm] = useState<number | null>(null);
 
   const q = query.trim().toLowerCase();
-  const matching = candidates.filter(
+  const results = candidates.filter(
     (c) =>
       (!q ||
-        [c.displayName, c.location?.label ?? '', c.about ?? ''].some((s) => s.toLowerCase().includes(q))) &&
+        [c.displayName, c.about ?? ''].some((s) => s.toLowerCase().includes(q))) &&
       (!position || c.desiredPosition === position),
   );
-  const results = nearby(matching, (c) => c.location, origin, radiusKm);
 
   return (
     <PublicLayout>
@@ -42,7 +36,7 @@ export function CandidatesPage() {
       <div className="filters">
         <input
           type="search"
-          placeholder="Search by name, city or skills"
+          placeholder="Search by name or skills"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           aria-label="Search candidates"
@@ -53,14 +47,13 @@ export function CandidatesPage() {
             <option key={c}>{c}</option>
           ))}
         </select>
-        <NearFilter origin={origin} onOriginChange={setOrigin} radiusKm={radiusKm} onRadiusChange={setRadiusKm} />
       </div>
 
       <p className="muted small">
-        {results.length} candidates{origin && ` · sorted by distance from ${origin.label}`}
+        {results.length} candidates
       </p>
       <div className="list">
-        {results.map(({ item: c, distance }) => (
+        {results.map((c) => (
           <div key={c.id} className="card list-card">
             <div className="list-card-head">
               <h3>{c.displayName}</h3>
@@ -69,7 +62,6 @@ export function CandidatesPage() {
             <p className="company">{c.desiredPosition ?? 'Position not specified'}</p>
             {c.about && <p className="muted">{c.about}</p>}
             <div className="tags">
-              <LocationTag location={c.location} distance={distance} />
               {c.experienceYears !== undefined && (
                 <span className="tag">
                   {c.experienceYears} {c.experienceYears === 1 ? 'year' : 'years'} experience

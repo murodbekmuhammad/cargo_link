@@ -182,3 +182,16 @@ a.list-card:hover { border-color: var(--primary); }
 .vacancy-form { border-top: 1px solid var(--border); padding-top: 1rem; margin-bottom: 1rem; }
 .form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; }
 .form-actions .primary-btn { padding: 0.6rem 1.2rem; }
+
+/* Map */
+.results-bar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+.results-bar p { margin: 0; }
+.view-toggle { margin: 0; flex: 0 0 auto; }
+.view-toggle .tab { padding: 0.35rem 0.9rem; font-size: 0.9rem; white-space: nowrap; }
+.vacancy-map { width: 100%; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; z-index: 0; background: #e5e7eb; }
+.detail-map { grid-column: 1; }
+.detail-map h3 { margin-top: 0; }
+.map-popup { font: 0.85rem/1.4 Inter, system-ui, sans-serif; }
+.map-popup-head { font-weight: 600; margin-bottom: 0.35rem; color: var(--muted); }
+.map-popup ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.map-popup span { color: var(--muted); }

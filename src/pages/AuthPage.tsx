@@ -1,8 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
-import { LocationPicker } from '../components/LocationPicker';
-import { JOB_CATEGORIES, ROLE_HOME, type GeoLocation, type JobCategory, type Role } from '../types';
+import { JOB_CATEGORIES, ROLE_HOME, type JobCategory, type Role } from '../types';
 
 const ROLES: { value: Role; title: string; description: string; icon: string }[] = [
   {
@@ -45,7 +44,6 @@ export function AuthPage() {
   });
   const [mode, setMode] = useState<Mode>(params.get('mode') === 'register' ? 'register' : 'login');
   const [error, setError] = useState<string | null>(null);
-  const [location, setLocation] = useState<GeoLocation>();
   const [form, setForm] = useState({
     name: '',
     companyName: '',
@@ -87,7 +85,6 @@ export function AuthPage() {
           phone: role === 'applicant' ? form.phone.trim() : undefined,
           desiredPosition:
             role === 'applicant' && form.desiredPosition ? (form.desiredPosition as JobCategory) : undefined,
-          location: role === 'applicant' ? location : undefined,
         });
       }
       navigate(redirect ?? ROLE_HOME[u.role], { replace: true });
@@ -181,23 +178,15 @@ export function AuthPage() {
                 </label>
               )}
               {isRegister && role === 'applicant' && (
-                <>
-                  <label>
-                    Desired position
-                    <select value={form.desiredPosition} onChange={update('desiredPosition')}>
-                      <option value="">Not specified</option>
-                      {JOB_CATEGORIES.map((c) => (
-                        <option key={c}>{c}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
-                    <span>
-                      Location <span className="muted">(optional — helps nearby companies find you)</span>
-                    </span>
-                    <LocationPicker value={location} onChange={setLocation} />
-                  </label>
-                </>
+                <label>
+                  Desired position
+                  <select value={form.desiredPosition} onChange={update('desiredPosition')}>
+                    <option value="">Not specified</option>
+                    {JOB_CATEGORIES.map((c) => (
+                      <option key={c}>{c}</option>
+                    ))}
+                  </select>
+                </label>
               )}
               <label>
                 Email

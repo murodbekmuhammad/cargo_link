@@ -1,4 +1,3 @@
-import { useAuth } from '../auth/useAuth';
 import type { GeoLocation } from '../types';
 import { LocationPicker } from './LocationPicker';
 
@@ -11,20 +10,11 @@ interface Props {
   onRadiusChange: (r: number | null) => void;
 }
 
-/** "Near [place] within [N km]" — sorts results nearest first. */
+/** "Near [place] within [N km]" — sorts results nearest first. The place is never saved. */
 export function NearFilter({ origin, onOriginChange, radiusKm, onRadiusChange }: Props) {
-  const { user } = useAuth();
-  const presets = user?.location ? [{ label: `My location — ${user.location.label}`, location: user.location }] : [];
-
   return (
     <>
-      <LocationPicker
-        value={origin}
-        onChange={onOriginChange}
-        emptyLabel="Near: anywhere"
-        presets={presets}
-        aria-label="Near location"
-      />
+      <LocationPicker value={origin} onChange={onOriginChange} emptyLabel="Near: anywhere" aria-label="Near location" />
       {origin && (
         <select
           value={radiusKm ?? ''}

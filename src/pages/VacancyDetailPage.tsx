@@ -1,21 +1,18 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
-import { LocationPicker } from '../components/LocationPicker';
 import { LocationTag } from '../components/LocationTag';
 import { PublicLayout } from '../components/PublicLayout';
+import { VacancyMap } from '../components/VacancyMap';
 import { applyToVacancy, hasApplied } from '../data/applications';
 import { getVacancy } from '../data/vacancies';
-import type { GeoLocation } from '../types';
 import { formatSalary, timeAgo } from '../utils/format';
-import { distanceKm } from '../utils/geo';
 
 export function VacancyDetailPage() {
   const { id = '' } = useParams();
   const { user } = useAuth();
   const vacancy = getVacancy(id);
   const [applied, setApplied] = useState(() => (user ? hasApplied(id, user.id) : false));
-  const [applyFrom, setApplyFrom] = useState<GeoLocation | undefined>(user?.location);
 
   if (!vacancy) {
     return (
@@ -26,8 +23,6 @@ export function VacancyDetailPage() {
     );
   }
 
-  const distanceFromYou =
-    user?.location && vacancy.location ? distanceKm(user.location, vacancy.location) : undefined;
   const here = encodeURIComponent(`/vacancies/${vacancy.id}`);
 
   let action;
@@ -57,28 +52,16 @@ export function VacancyDetailPage() {
     );
   } else {
     action = (
-      <>
-        <label className="field">
-          <span>
-            Your location <span className="muted">(optional)</span>
-          </span>
-          <LocationPicker
-            value={applyFrom}
-            onChange={setApplyFrom}
-            presets={user.location ? [{ label: `My location — ${user.location.label}`, location: user.location }] : []}
-          />
-        </label>
-        <button
-          type="button"
-          className="primary-btn"
-          onClick={() => {
-            applyToVacancy(vacancy.id, user.id, applyFrom);
-            setApplied(true);
-          }}
-        >
-          Apply now
-        </button>
-      </>
+      <button
+        type="button"
+        className="primary-btn"
+        onClick={() => {
+          applyToVacancy(vacancy.id, user.id);
+          setApplied(true);
+        }}
+      >
+        Apply now
+      </button>
     );
   }
 
@@ -94,7 +77,7 @@ export function VacancyDetailPage() {
           <div className="tags">
             <span className="tag">{vacancy.category}</span>
             {vacancy.location ? (
-              <LocationTag location={vacancy.location} distance={distanceFromYou} />
+              <LocationTag location={vacancy.location} />
             ) : (
               <span className="tag">Location not specified</span>
             )}
@@ -114,6 +97,13 @@ export function VacancyDetailPage() {
           <p className="muted small">Posted {timeAgo(vacancy.postedAt).toLowerCase()}</p>
           {action}
         </aside>
+        {vacancy.location && (
+          <section className="card detail-map">
+            <h3>Location</h3>
+            <p className="muted small">📍 {vacancy.location.label}</p>
+            <VacancyMap vacancies={[{ item: vacancy }]} height={280} showLinks={false} />
+          </section>
+        )}
       </div>
     </PublicLayout>
   );

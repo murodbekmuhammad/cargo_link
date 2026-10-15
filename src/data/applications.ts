@@ -1,4 +1,4 @@
-import type { Application, GeoLocation } from '../types';
+import type { Application } from '../types';
 
 const APPLICATIONS_KEY = 'cargolink.applications';
 
@@ -21,7 +21,7 @@ export function hasApplied(vacancyId: string, applicantId: string): boolean {
   return read().some((a) => a.vacancyId === vacancyId && a.applicantId === applicantId);
 }
 
-export function applyToVacancy(vacancyId: string, applicantId: string, location?: GeoLocation): Application {
+export function applyToVacancy(vacancyId: string, applicantId: string): Application {
   const all = read();
   const existing = all.find((a) => a.vacancyId === vacancyId && a.applicantId === applicantId);
   if (existing) return existing;
@@ -29,7 +29,6 @@ export function applyToVacancy(vacancyId: string, applicantId: string, location?
     id: crypto.randomUUID(),
     vacancyId,
     applicantId,
-    location,
     status: 'submitted',
     createdAt: new Date().toISOString(),
   };

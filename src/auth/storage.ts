@@ -1,7 +1,6 @@
-import { cityLocation } from '../data/cities';
 import { SEED_USERS } from '../data/seed';
 import { shortName } from '../utils/format';
-import type { GeoLocation, PublicCandidate, RegisterInput, Role, StoredUser, User } from '../types';
+import type { PublicCandidate, RegisterInput, Role, StoredUser, User } from '../types';
 
 // Temporary client-side persistence until a real backend exists.
 // Passwords are stored in plain text here — do NOT ship this to production.
@@ -20,11 +19,12 @@ function readUsers(): StoredUser[] {
   return [...missingSeeds, ...stored.map(migrateLocation)];
 }
 
-/** Early accounts stored the city as plain text; convert it to a GeoLocation. */
+/** Applicant locations are no longer collected; drop any saved by older versions. */
 function migrateLocation(u: StoredUser): StoredUser {
-  const loc: unknown = u.location;
-  if (typeof loc !== 'string') return u;
-  return { ...u, location: cityLocation(loc) };
+  if (!('location' in u)) return u;
+  const copy: Partial<StoredUser> & { location?: unknown } = { ...u };
+  delete copy.location;
+  return copy as StoredUser;
 }
 
 function writeUsers(users: StoredUser[]) {
@@ -83,12 +83,6 @@ export function listUsers(): User[] {
   return readUsers().map(toPublic);
 }
 
-/** Round to ~10 km so the public list can't pinpoint where someone lives. */
-function coarsen(loc: GeoLocation): GeoLocation {
-  const round = (n: number) => Math.round(n * 10) / 10;
-  return { ...loc, lat: round(loc.lat), lng: round(loc.lng) };
-}
-
 export function listCandidates(): PublicCandidate[] {
   return readUsers()
     .filter((u) => u.role === 'applicant')
@@ -97,7 +91,6 @@ export function listCandidates(): PublicCandidate[] {
       id: u.id,
       displayName: shortName(u.name),
       desiredPosition: u.desiredPosition,
-      location: u.location && coarsen(u.location),
       experienceYears: u.experienceYears,
       licenses: u.licenses ?? [],
       about: u.about,
